@@ -62,10 +62,13 @@ for b in "${BINARIES[@]}"; do
 done
 
 # 4. Neovim runtime
+# Homebrew's share/nvim is a symlink into ../Cellar; copy the RESOLVED directory
+# (cp -RL) so the runtime isn't a dangling symlink inside the bundle.
 echo "==> Copying Neovim runtime"
-if [ -d "$BREW_PREFIX/share/nvim" ]; then
+NVIM_SHARE="$(python3 -c "import os,sys;print(os.path.realpath(sys.argv[1]))" "$BREW_PREFIX/share/nvim" 2>/dev/null || echo "$BREW_PREFIX/share/nvim")"
+if [ -d "$NVIM_SHARE" ]; then
   mkdir -p "$RES/share"
-  cp -R "$BREW_PREFIX/share/nvim" "$RES/share/nvim"
+  cp -RL "$NVIM_SHARE" "$RES/share/nvim"
 fi
 
 # 5. relocate dylibs so the binaries are portable
