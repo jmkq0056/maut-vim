@@ -92,6 +92,26 @@ else
   echo "!! icon not found at $ICON_SRC; app will use the default icon"
 fi
 
+# 6b. bundle the kitty terminal (self-contained .app) + config + Nerd Font.
+# MautVim runs inside kitty so images, all key combos, and truecolor work —
+# the system Terminal.app supports none of those well.
+KITTY_APP="/Applications/kitty.app"
+if [ -d "$KITTY_APP" ]; then
+  echo "==> Bundling kitty terminal"
+  cp -R "$KITTY_APP" "$RES/kitty.app"
+  cp "$ROOT/app/kitty.conf" "$RES/kitty.conf"
+else
+  echo "!! kitty.app not found at $KITTY_APP — install with 'brew install --cask kitty'"
+  echo "   The launcher will fall back to Terminal.app."
+fi
+
+echo "==> Bundling Nerd Font"
+mkdir -p "$RES/fonts"
+for variant in Regular Bold Italic BoldItalic; do
+  src="$HOME/Library/Fonts/JetBrainsMonoNerdFont-$variant.ttf"
+  [ -f "$src" ] && cp "$src" "$RES/fonts/"
+done
+
 # 7. internal launch script
 cat > "$RES/bin/mautvim" <<'LAUNCH'
 #!/bin/bash
@@ -128,18 +148,44 @@ exec "$RES/bin/nvim" "$@"
 LAUNCH
 chmod +x "$RES/bin/mautvim"
 
-# 8. app launcher (the bundle's main executable) — opens Terminal running mautvim
+# 8. app launcher (the bundle's main executable):
+#    install bundled font -> ask for a folder -> launch nvim inside bundled kitty.
 cat > "$APP/Contents/MacOS/MautVim" <<'MAIN'
 #!/bin/bash
 HERE="$(cd "$(dirname "$0")" && pwd)"
-LAUNCH="$(cd "$HERE/../Resources" && pwd)/bin/mautvim"
-# Open the system Terminal and run our launcher inside it.
-/usr/bin/osascript <<OSA
+RES="$(cd "$HERE/../Resources" && pwd)"
+KITTY="$RES/kitty.app/Contents/MacOS/kitty"
+LAUNCH="$RES/bin/mautvim"
+
+# Install the bundled Nerd Font on first run so icons render everywhere.
+if [ -d "$RES/fonts" ]; then
+  mkdir -p "$HOME/Library/Fonts"
+  for f in "$RES/fonts/"*.ttf; do
+    [ -e "$f" ] || continue
+    dest="$HOME/Library/Fonts/$(basename "$f")"
+    [ -f "$dest" ] || cp "$f" "$dest"
+  done
+fi
+
+# "Open Folder", editor-style — so we never index your entire home directory.
+DIR="$(/usr/bin/osascript -e 'try
+  POSIX path of (choose folder with prompt "MautVim — choose a folder to open:")
+on error
+  return ""
+end try' 2>/dev/null)"
+[ -z "$DIR" ] && DIR="$HOME"
+
+if [ -x "$KITTY" ]; then
+  exec "$KITTY" --directory "$DIR" --config "$RES/kitty.conf" --title "MautVim" "$LAUNCH"
+else
+  # Fallback if kitty wasn't bundled: system Terminal.
+  /usr/bin/osascript <<OSA
 tell application "Terminal"
   activate
-  do script "clear; exec '$LAUNCH'"
+  do script "cd '$DIR'; clear; exec '$LAUNCH'"
 end tell
 OSA
+fi
 MAIN
 chmod +x "$APP/Contents/MacOS/MautVim"
 

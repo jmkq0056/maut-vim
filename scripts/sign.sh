@@ -48,6 +48,12 @@ for b in nvim yazi rg fd fzf lazygit; do
   [ -f "$bin" ] && sign "$bin"
 done
 
+# The bundled kitty is its own .app; re-sign it (deep) so the outer bundle verifies.
+if [ -d "$APP/Contents/Resources/kitty.app" ]; then
+  echo "==> Signing bundled kitty.app"
+  codesign --force --deep "${EXTRA[@]}" --sign "$IDENTITY" "$APP/Contents/Resources/kitty.app"
+fi
+
 echo "==> Signing the app bundle"
 sign "$APP"
 

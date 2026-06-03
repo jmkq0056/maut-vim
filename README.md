@@ -61,11 +61,17 @@ Nothing is sent anywhere — it only reads files Claude already wrote to your di
 
 ### Option A — the app (recommended for sharing)
 
-Download `MautVim.dmg` from the [Releases](https://github.com/jmkq0056/maut-vim/releases)
-page, open it, drag **MautVim** to Applications, and launch it. It opens a
-Terminal window running a fully self-contained Neovim — bundled `nvim`, `yazi`,
-`rg`, `fd`, `fzf`, `lazygit`, the runtime, and all plugins. Nothing else to
-install.
+Download `MautVim-<version>.dmg` from the [Releases](https://github.com/jmkq0056/maut-vim/releases)
+page, open it, drag **MautVim** to Applications, and launch it. A folder picker
+appears (editor-style "Open Folder") — choose a project, and MautVim opens it.
+
+Everything is bundled — nothing else to install:
+
+- **[kitty](https://sw.kovidgoyal.net/kitty/)**, a fast GPU terminal, so image
+  previews, truecolor, and every key combo actually work (the system Terminal
+  supports none of those well)
+- `nvim`, `yazi`, `rg`, `fd`, `fzf`, `lazygit`, the Neovim runtime, all plugins,
+  and the JetBrains Mono Nerd Font
 
 > The first time, macOS Gatekeeper may warn that the app is from an
 > unidentified developer (it's ad-hoc signed). Right-click → **Open**, or run
@@ -113,9 +119,13 @@ maut-vim/
 │   ├── lua/config/              options, keymaps, lazy bootstrap
 │   ├── lua/plugins/             colorscheme, yazi, which-key, dashboard, maut-sessions spec
 │   └── maut-sessions/           the custom plugin (lua/maut-sessions/*)
+├── app/
+│   └── kitty.conf               bundled terminal config (tokyonight)
+├── assets/
+│   └── mautvim.icns             app icon
 ├── scripts/
-│   ├── build-app.sh             assemble MautVim.app
-│   ├── sign.sh                  codesign the app + dmg
+│   ├── build-app.sh             assemble MautVim.app (bundles kitty + nvim + plugins)
+│   ├── sign.sh                  codesign the app (incl. nested kitty) + dmg
 │   └── build-dmg.sh             create the distributable DMG
 └── dist/                        build output (gitignored)
 ```
