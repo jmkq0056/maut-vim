@@ -1,0 +1,16 @@
+# Build output (the .app and .dmg are shipped via GitHub Releases, never committed)
+/dist/
+*.dmg
+*.app
+
+# Neovim runtime state that gets generated on first launch
+nvim-config/lazyvim.json.bak
+
+# macOS cruft
+.DS_Store
+.AppleDouble
+._*
+
+# Editor / misc
+*.log
+*.tmp
