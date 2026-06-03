@@ -139,6 +139,18 @@ export MAGICK_CONFIGURE_PATH="$RES/imagemagick"
 
 CONFIG_DIR="$HOME/.config/mautvim"
 DATA_DIR="$HOME/.local/share/mautvim"
+CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/mautvim"
+
+# vim.loader caches absolute module paths. If the app moved (reinstall, update,
+# or Gatekeeper "translocation" running it from a random read-only path), those
+# cached paths go stale and nvim throws "module not found". Clear the cache when
+# the bundle's Resources path changes (cheap: only on the first launch after a move).
+mkdir -p "$DATA_DIR"
+MARKER="$DATA_DIR/.runtime_path"
+if [ "$(cat "$MARKER" 2>/dev/null)" != "$RES" ]; then
+  rm -rf "$CACHE_DIR/luac" 2>/dev/null
+  printf '%s' "$RES" > "$MARKER"
+fi
 
 # Always refresh the config (cheap, keeps the app's config authoritative)…
 mkdir -p "$CONFIG_DIR"
