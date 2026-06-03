@@ -84,12 +84,12 @@ for b in "${BINARIES[@]}"; do
     echo "      (dylibbundler reported issues for $b; it may rely only on system libs)"
 done
 
-# 6. icon (reuse the maut reaper if available)
-ICON_SRC="$HOME/Developer/maut-code/resources/darwin/code.icns"
+# 6. icon (MautVim's own icon — distinct from maut-code's reaper)
+ICON_SRC="$ROOT/assets/mautvim.icns"
 if [ -f "$ICON_SRC" ]; then
   cp "$ICON_SRC" "$RES/mautvim.icns"
 else
-  echo "!! reaper icon not found; app will use the default icon"
+  echo "!! icon not found at $ICON_SRC; app will use the default icon"
 fi
 
 # 7. internal launch script
