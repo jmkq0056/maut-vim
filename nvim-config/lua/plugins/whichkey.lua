@@ -12,7 +12,6 @@ return {
       },
       spec = {
         { "<leader>C", group = "Claude (sessions)", icon = "󰚩" },
-        { "<leader>e", desc = "File browser (Yazi)", icon = "" },
       },
       -- Show a friendly notice if the help key is pressed.
       win = { border = "rounded" },

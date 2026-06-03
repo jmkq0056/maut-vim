@@ -112,15 +112,24 @@ for variant in Regular Bold Italic BoldItalic; do
   [ -f "$src" ] && cp "$src" "$RES/fonts/"
 done
 
+# 6c. ImageMagick policy so inline PDF/image preview (snacks.image) works.
+echo "==> Bundling ImageMagick policy"
+mkdir -p "$RES/imagemagick"
+cp "$ROOT/app/imagemagick-policy.xml" "$RES/imagemagick/policy.xml"
+
 # 7. internal launch script
 cat > "$RES/bin/mautvim" <<'LAUNCH'
 #!/bin/bash
 # Internal launcher: seed config/plugins into an isolated NVIM_APPNAME, then run nvim.
 set -e
 RES="$(cd "$(dirname "$0")/.." && pwd)"        # .../Contents/Resources
-export PATH="$RES/bin:$PATH"
+# Bundled bins first, then Homebrew dirs so optional preview tools (magick, gs,
+# pdftoppm) are found for inline image/PDF rendering when installed.
+export PATH="$RES/bin:/opt/homebrew/bin:/usr/local/bin:$PATH"
 export NVIM_APPNAME="mautvim"
 export VIMRUNTIME="$RES/share/nvim/runtime"
+# Use MautVim's permissive ImageMagick policy (system policy untouched).
+export MAGICK_CONFIGURE_PATH="$RES/imagemagick"
 
 CONFIG_DIR="$HOME/.config/mautvim"
 DATA_DIR="$HOME/.local/share/mautvim"
@@ -167,22 +176,16 @@ if [ -d "$RES/fonts" ]; then
   done
 fi
 
-# "Open Folder", editor-style — so we never index your entire home directory.
-DIR="$(/usr/bin/osascript -e 'try
-  POSIX path of (choose folder with prompt "MautVim — choose a folder to open:")
-on error
-  return ""
-end try' 2>/dev/null)"
-[ -z "$DIR" ] && DIR="$HOME"
-
+# No forced folder dialog — MautVim opens to a welcome screen that lists recent
+# projects (press a number) with an "Open Folder…" action when you want to browse.
 if [ -x "$KITTY" ]; then
-  exec "$KITTY" --directory "$DIR" --config "$RES/kitty.conf" --title "MautVim" "$LAUNCH"
+  exec "$KITTY" --start-as fullscreen --directory "$HOME" --config "$RES/kitty.conf" --title "MautVim" "$LAUNCH"
 else
   # Fallback if kitty wasn't bundled: system Terminal.
   /usr/bin/osascript <<OSA
 tell application "Terminal"
   activate
-  do script "cd '$DIR'; clear; exec '$LAUNCH'"
+  do script "clear; exec '$LAUNCH'"
 end tell
 OSA
 fi

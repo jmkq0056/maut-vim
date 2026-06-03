@@ -1,4 +1,5 @@
--- Auto-loaded by LazyVim. LazyVim already provides highlight-on-yank, auto-resize,
--- last-cursor-position, etc. Add MautVim-specific autocmds here.
-
--- Nothing custom yet — kept as a clearly-labeled extension point.
+-- Auto-loaded by LazyVim (on VeryLazy). LazyVim already provides
+-- highlight-on-yank, auto-resize, last-cursor-position, etc.
+--
+-- Note: MautVim's project manager is registered in init.lua (early), not here,
+-- because this file is deferred to VeryLazy — too late for its VimEnter hook.

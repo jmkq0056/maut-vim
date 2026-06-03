@@ -11,3 +11,22 @@ end, { desc = "Show ALL keybindings" })
 
 -- <Esc> clears search highlight too.
 map("n", "<Esc>", "<cmd>nohlsearch<cr><Esc>", { desc = "Clear search highlight" })
+
+-- Back to the welcome / home screen.
+map("n", "<leader>H", function()
+  pcall(function()
+    Snacks.dashboard()
+  end)
+end, { desc = "Home (welcome screen)" })
+
+-- Open the current file in its real macOS app (e.g. a PDF in Preview, to
+-- scroll/zoom/page through it properly).
+map("n", "<leader>o", function()
+  local f = vim.fn.expand("%:p")
+  if f ~= "" then
+    pcall(vim.ui.open, f)
+  end
+end, { desc = "Open current file in default app" })
+
+-- Close the current file quickly (alias people expect).
+map("n", "<leader>x", "<cmd>bdelete<cr>", { desc = "Close current file" })

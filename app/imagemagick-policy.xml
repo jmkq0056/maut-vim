@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  MautVim's ImageMagick policy. Activated only for MautVim via
+  MAGICK_CONFIGURE_PATH so it never changes the system policy.
+
+  Homebrew's default policy denies all coders (rights="none" pattern="*"),
+  which blocks rasterizing PDF/SVG/etc. for inline preview. This permissive
+  policy re-enables them for a local, interactive editor.
+-->
+<policymap>
+  <policy domain="coder" rights="read|write" pattern="*" />
+  <policy domain="path" rights="read|write" pattern="*" />
+  <policy domain="resource" name="memory" value="2GiB" />
+  <policy domain="resource" name="disk" value="4GiB" />
+</policymap>

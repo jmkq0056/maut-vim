@@ -5,9 +5,11 @@ return {
     event = "VeryLazy",
     dependencies = { "folke/snacks.nvim" },
     keys = {
+      -- Yazi is the *popup* file manager. The persistent sidebar tree stays on
+      -- <leader>e (Snacks explorer, LazyVim default) so it feels like VS Code.
       { "<leader>-", function() require("yazi").yazi() end, desc = "Yazi (browse from current file)" },
-      { "<leader>e", function() require("yazi").yazi() end, desc = "File browser (Yazi)" },
-      { "<leader>E", function() require("yazi").yazi(nil, vim.fn.getcwd()) end, desc = "File browser at project root" },
+      { "<leader>fm", function() require("yazi").yazi() end, desc = "Yazi file manager" },
+      { "<leader>fM", function() require("yazi").yazi(nil, vim.fn.getcwd()) end, desc = "Yazi at project root" },
     },
     opts = {
       open_for_directories = true, -- `nvim some/dir` opens Yazi instead of netrw
