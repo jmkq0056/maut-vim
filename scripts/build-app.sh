@@ -131,9 +131,10 @@ cat > "$RES/bin/mautvim" <<'LAUNCH'
 # Internal launcher: seed config/plugins into an isolated NVIM_APPNAME, then run nvim.
 set -e
 RES="$(cd "$(dirname "$0")/.." && pwd)"        # .../Contents/Resources
-# Bundled bins first, then Homebrew dirs so optional preview tools (magick, gs,
-# pdftoppm) are found for inline image/PDF rendering when installed.
-export PATH="$RES/bin:/opt/homebrew/bin:/usr/local/bin:$PATH"
+# Bundled bins first, then the user's local bin (claude CLI lives there) and
+# Homebrew dirs so the `claude` command and preview tools (magick, gs, pdftoppm)
+# are found. LaunchServices gives a minimal PATH, so we add these explicitly.
+export PATH="$RES/bin:$HOME/.local/bin:/opt/homebrew/bin:/usr/local/bin:$PATH"
 export NVIM_APPNAME="mautvim"
 export VIMRUNTIME="$RES/share/nvim/runtime"
 # Use MautVim's permissive ImageMagick policy (system policy untouched).
