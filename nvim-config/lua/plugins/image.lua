@@ -9,9 +9,11 @@ return {
       image = {
         enabled = true,
         doc = { enabled = true, inline = true, float = true },
-        -- Only formats we can reliably rasterize. Video is left to the native
-        -- app (see lua/maut/external.lua) so we don't depend on ffmpeg.
-        formats = { "png", "jpg", "jpeg", "gif", "bmp", "webp", "tiff", "heic", "avif", "svg", "pdf", "icns" },
+        -- Inline rendering only for real images — a quick glance at a picture,
+        -- then close with <leader>x. PDFs are NOT here: a PDF image overlays the
+        -- editor UI (hiding which-key/cmdline) and can't page/scroll, so PDFs
+        -- open in Preview instead (see lua/maut/external.lua).
+        formats = { "png", "jpg", "jpeg", "gif", "bmp", "webp", "tiff", "heic", "avif", "svg", "icns" },
       },
     },
   },

@@ -4,9 +4,12 @@
 
 local M = {}
 
--- File types that can't be rendered inline (images/PDFs are handled by
--- snacks.image — see lua/plugins/image.lua). These open in their native app.
+-- File types opened in their native macOS app. Real images are handled inline
+-- by snacks.image (see lua/plugins/image.lua); everything here either can't be
+-- rendered as text/image or is better in its real app — PDFs especially, since
+-- an inline PDF image overlays the editor UI and can't scroll through pages.
 local PATTERNS = {
+  "*.pdf",
   "*.docx", "*.doc", "*.xlsx", "*.xls", "*.pptx", "*.ppt", "*.odt", "*.pages", "*.numbers", "*.key",
   "*.zip", "*.tar", "*.gz", "*.tgz", "*.7z", "*.rar", "*.dmg", "*.pkg",
   "*.mp4", "*.mov", "*.m4v", "*.avi", "*.mkv", "*.webm", "*.mp3", "*.m4a", "*.wav", "*.flac",
@@ -34,13 +37,13 @@ function M.setup()
         "",
         "   " .. vim.fn.fnamemodify(file, ":t"),
         "",
-        "  This is a binary / document file — MautVim opened it in its",
-        "  default macOS app (PDFs in Preview, images in Preview, etc.).",
+        "  Opened in its native macOS app (PDFs in Preview, where you can",
+        "  scroll, zoom and page through them; Office docs in their app).",
         "",
-        "  A terminal editor can't render these as text.",
+        "  A terminal editor can't usefully render these inline.",
         "",
-        "  q          close this buffer",
-        "  <leader>fm preview it inside the editor with Yazi instead",
+        "  q           close this buffer",
+        "  <leader>o   open it again in its native app",
       })
       vim.bo[buf].modifiable = false
       vim.bo[buf].modified = false
