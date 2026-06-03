@@ -71,18 +71,15 @@ if [ -d "$NVIM_SHARE" ]; then
   cp -RL "$NVIM_SHARE" "$RES/share/nvim"
 fi
 
-# 5. relocate dylibs so the binaries are portable
-echo "==> Relocating dylibs with dylibbundler"
+# 5. bundle non-system dylibs into Resources/lib and rewrite references.
+# (dylibbundler can't resolve the @executable_path refs that modern relocatable
+# Homebrew binaries use, so we use our own collector — see scripts/bundle-libs.py.)
+echo "==> Bundling dylibs"
+BINS=()
 for b in "${BINARIES[@]}"; do
-  [ -f "$RES/bin/$b" ] || continue
-  echo "    - $b"
-  # </dev/null prevents an interactive prompt from hanging the build.
-  dylibbundler -of -cd -b \
-    -x "$RES/bin/$b" \
-    -d "$RES/lib" \
-    -p "@executable_path/../lib/" </dev/null || \
-    echo "      (dylibbundler reported issues for $b; it may rely only on system libs)"
+  [ -f "$RES/bin/$b" ] && BINS+=("$RES/bin/$b")
 done
+python3 "$ROOT/scripts/bundle-libs.py" "$RES/lib" "$BREW_PREFIX/lib,$BREW_PREFIX/lib/lua/5.1" "${BINS[@]}"
 
 # 6. icon (MautVim's own icon — distinct from maut-code's reaper)
 ICON_SRC="$ROOT/assets/mautvim.icns"
