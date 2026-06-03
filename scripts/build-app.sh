@@ -97,8 +97,16 @@ fi
 # the system Terminal.app supports none of those well.
 KITTY_APP="/Applications/kitty.app"
 if [ -d "$KITTY_APP" ]; then
-  echo "==> Bundling kitty terminal"
-  cp -R "$KITTY_APP" "$RES/kitty.app"
+  echo "==> Merging kitty into MautVim.app (so it runs AS MautVim, one Dock icon)"
+  # Put kitty's binaries alongside our launcher, and its frameworks/resources
+  # under MautVim.app — kitty resolves resources relative to its executable, so
+  # this makes MautVim.app the enclosing bundle (MautVim icon + identity).
+  cp -R "$KITTY_APP/Contents/MacOS/." "$APP/Contents/MacOS/"
+  if [ -d "$KITTY_APP/Contents/Frameworks" ]; then
+    mkdir -p "$APP/Contents/Frameworks"
+    cp -R "$KITTY_APP/Contents/Frameworks/." "$APP/Contents/Frameworks/"
+  fi
+  cp -R "$KITTY_APP/Contents/Resources/." "$RES/"
   cp "$ROOT/app/kitty.conf" "$RES/kitty.conf"
 else
   echo "!! kitty.app not found at $KITTY_APP — install with 'brew install --cask kitty'"
@@ -163,7 +171,7 @@ cat > "$APP/Contents/MacOS/MautVim" <<'MAIN'
 #!/bin/bash
 HERE="$(cd "$(dirname "$0")" && pwd)"
 RES="$(cd "$HERE/../Resources" && pwd)"
-KITTY="$RES/kitty.app/Contents/MacOS/kitty"
+KITTY="$HERE/kitty"   # kitty merged into MautVim.app/Contents/MacOS — runs AS MautVim
 LAUNCH="$RES/bin/mautvim"
 
 # Install the bundled Nerd Font on first run so icons render everywhere.

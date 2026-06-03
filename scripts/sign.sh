@@ -48,14 +48,10 @@ for b in nvim yazi rg fd fzf lazygit; do
   [ -f "$bin" ] && sign "$bin"
 done
 
-# The bundled kitty is its own .app; re-sign it (deep) so the outer bundle verifies.
-if [ -d "$APP/Contents/Resources/kitty.app" ]; then
-  echo "==> Signing bundled kitty.app"
-  codesign --force --deep "${EXTRA[@]}" --sign "$IDENTITY" "$APP/Contents/Resources/kitty.app"
-fi
-
-echo "==> Signing the app bundle"
-sign "$APP"
+# kitty's binaries + frameworks are merged into MautVim.app. Deep-sign the whole
+# bundle so kitty, kitten, the frameworks, and all helpers are covered.
+echo "==> Deep-signing the app bundle (covers kitty + frameworks)"
+codesign --force --deep "${EXTRA[@]}" --sign "$IDENTITY" "$APP"
 
 echo "==> Verifying"
 codesign --verify --deep --strict --verbose=2 "$APP" || echo "(verify reported warnings — expected for ad-hoc)"
